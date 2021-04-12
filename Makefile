@@ -64,7 +64,8 @@ image:
 image-build: Dockerfile $(image)
 	@echo '	DOCKER image build	$(img_a)';
 	@docker image build -t '$(img_a)' $(CURDIR) >/dev/null;
-	@sed -Ei 's/^lbl.*/lbl	$(lbl_a)/' $(image_);
+	@sed -i  's/^lbl.*/lbl	$(lbl_a)/' $(image_);
+	@sed -Ei 's/^(digest	$(arch)).*/\1/' $(image_);
 
 .PHONY: image-push
 image-push:
