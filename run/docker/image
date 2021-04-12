@@ -1,3 +1,3 @@
-lbl
-digest	aarch64
-digest	x86_64
+lbl	1.19.9-alpine-alx5
+digest	aarch64	sha256:bc8535f6f794a7d79080112d74fe937d260edc11fd5f95facb6ee40c0e91ee0b
+digest	x86_64	sha256:aaee148d3b203d6c3be0164003fd2568f152dd9c9c0564a8ba98b90caf5b29e2
