@@ -29,22 +29,5 @@ jobs:
                         name: make stack-deploy
                         run: sudo make stack-deploy node_role=manager;
                 -
-                        name: docker service ls
-                        run: |
-                                while true; do
-                                        sleep 1;
-                                        docker service ls \
-                                        |grep '\([0-9]\)/\1' \
-                                        && break;
-                                done;
-                -
-                        name: curl
-                        run: |
-                                stability="$(<.config grep '^stable' | cut -f2)";
-                                port="$(<.config grep '^port' | grep "${stability}" | cut -f3)";
-                                while true; do
-                                        sleep 1;
-                                        curl -4s -o /dev/null -w '%{http_code}' localhost:${port} \
-                                        |grep 200 \
-                                        && break;
-                                done;
+                        name: make stack-test
+                        run: make stack-test;

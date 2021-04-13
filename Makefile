@@ -3,6 +3,7 @@
 # Copyright (C) 2021		Alejandro Colomar <alx.manpages@gmail.com>
 # SPDX-License-Identifier:	GPL-2.0-only OR LGPL-2.0-only
 ########################################################################
+SHELL=bash
 
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
@@ -40,6 +41,9 @@ stability	= $(shell <$(config) grep '^stable' | cut -f2)
 stack		= $(project)-$(stability)
 node_role	= $(shell <$(config) grep '^node' | cut -f2)
 host_port	= $(shell <$(config) grep '^port' | grep '$(stability)' | cut -f3)
+
+# Testing
+retries	= 10
 
 .PHONY: all
 all: image
@@ -107,3 +111,31 @@ stack-deploy:
 stack-rm:
 	@echo '	STACK rm';
 	@alx_stack_delete -o '$(orchestrator)' '$(stack)';
+
+.PHONY: test
+test: stack-test
+
+.PHONY: stack-test
+stack-test:
+	@$(MAKE) stack-test-service;
+	@$(MAKE) stack-test-curl;
+
+.PHONY: stack-test-service
+stack-test-service:
+	@echo '	TEST docker service';
+	@for ((i = 0; i < $(retries); i++)); do \
+		sleep 1; \
+		docker service ls \
+		|grep -qE '([0-9])/\1' \
+		&& break; \
+	done;
+
+.PHONY: stack-test-curl
+stack-test-curl:
+	@echo '	TEST curl';
+	@for ((i = 0; i < $(retries); i++)); do \
+		sleep 1; \
+		curl -4s -o /dev/null -w '%{http_code}' localhost:$(host_port) \
+		|grep -q 200 \
+		&& break; \
+	done;
