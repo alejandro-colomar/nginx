@@ -113,15 +113,12 @@ stack-rm:
 	@alx_stack_delete -o '$(orchestrator)' '$(stack)';
 
 .PHONY: test
-test: stack-test
+test:
+	@$(MAKE) test-docker-service;
+	@$(MAKE) test-curl;
 
-.PHONY: stack-test
-stack-test:
-	@$(MAKE) stack-test-service;
-	@$(MAKE) stack-test-curl;
-
-.PHONY: stack-test-service
-stack-test-service:
+.PHONY: test-docker-service
+test-docker-service:
 	@echo '	TEST docker service';
 	@for ((i = 0; i < $(retries); i++)); do \
 		sleep 1; \
@@ -131,7 +128,7 @@ stack-test-service:
 	done;
 
 .PHONY: stack-test-curl
-stack-test-curl:
+test-curl:
 	@echo '	TEST curl';
 	@for ((i = 0; i < $(retries); i++)); do \
 		sleep 1; \

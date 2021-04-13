@@ -29,5 +29,5 @@ jobs:
                         name: make stack-deploy
                         run: sudo make stack-deploy node_role=manager;
                 -
-                        name: make stack-test
-                        run: make stack-test;
+                        name: make test
+                        run: make test;
