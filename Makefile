@@ -43,7 +43,7 @@ node_role	= $(shell <$(config) grep '^node' | cut -f2)
 host_port	= $(shell <$(config) grep '^port' | grep '$(stability)' | cut -f3)
 
 # Testing
-retries	= 10
+retries	= 50
 
 .PHONY: all
 all: image
