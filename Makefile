@@ -136,3 +136,17 @@ test-curl:
 		|grep -q 200 \
 		&& break; \
 	done;
+
+.PHONY: prereq
+prereq:
+	@sudo -u $(SUDO_USER) $(MAKE) prereq-config;
+	@$(MAKE) prereq-install;
+
+.PHONY: prereq-config
+prereq-config:
+	git submodule init;
+	git submodule update;
+
+.PHONY: prereq-install
+prereq-install:
+	@$(MAKE) -C $(CURDIR)/src/alx/containers/;
