@@ -95,7 +95,7 @@ commits created in step 3 into this one is nicer).
 	tag="v${version}";
 
 	git add run/docker/image
-	git commit -sm "Release ${tag}";
+	git commit -sm "${tag}";
 	git push;
 
 
