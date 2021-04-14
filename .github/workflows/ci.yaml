@@ -8,17 +8,11 @@ jobs:
                 runs-on: ubuntu-20.04
                 steps:
                 -
-                        name: git clone alejandro-colomar/containers
-                        run: |
-                                sudo git -C /usr/local/src \
-                                        clone --single-branch --branch 'v0.4.1' \
-                                        http://github.com/alejandro-colomar/containers.git;
-                -
-                        name: make swarm
-                        run: sudo make -C /usr/local/src/containers swarm;
-                -
                         name: checkout
                         uses: actions/checkout@v2
+                -
+                        name: make prereq
+                        run: sudo make prereq;
                 -
                         name: make image-build
                         run: make image-build lbl=ci;
