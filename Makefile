@@ -119,7 +119,7 @@ test:
 
 .PHONY: test-docker-service
 test-docker-service:
-	@echo '	TEST docker service';
+	@echo '	TEST	docker service';
 	@for ((i = 0; i < $(retries); i++)); do \
 		sleep 1; \
 		docker service ls \
@@ -129,7 +129,7 @@ test-docker-service:
 
 .PHONY: stack-test-curl
 test-curl:
-	@echo '	TEST curl';
+	@echo '	TEST	curl';
 	@for ((i = 0; i < $(retries); i++)); do \
 		sleep 1; \
 		curl -4s -o /dev/null -w '%{http_code}' localhost:$(host_port) \
@@ -144,8 +144,10 @@ prereq:
 
 .PHONY: prereq-config
 prereq-config:
-	git submodule init;
-	git submodule update;
+	@echo '	GIT submodule init';
+	@git submodule init >/dev/null;
+	@echo '	GIT submodule update';
+	@git submodule update >/dev/null;
 
 .PHONY: prereq-install
 prereq-install:
@@ -155,9 +157,20 @@ prereq-install:
 ci:
 	@echo '	DOCKER swarm init';
 	@sudo -u $(SUDO_USER) docker swarm init --advertise-addr lo >/dev/null 2>&1 ||:;
+	@echo;
+	@echo '	MAKE	prereq';
 	@$(MAKE) prereq;
-	@sudo -u $(SUDO_USER) $(MAKE) image-build lbl=ci;
+	@echo;
+	@echo '	MAKE	stack-rm';
 	@sudo -u $(SUDO_USER) $(MAKE) stack-rm ||:;
 	@sudo sleep 5;
+	@echo;
+	@echo '	MAKE	image-build';
+	@sudo -u $(SUDO_USER) $(MAKE) image-build lbl=ci;
+	@echo;
+	@echo '	MAKE	stack-deploy';
 	@$(MAKE) stack-deploy node_role=manager;
+	@echo;
+	@echo '	MAKE	test';
 	@sudo -u $(SUDO_USER) $(MAKE) test;
+	@echo;
