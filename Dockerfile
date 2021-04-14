@@ -1,6 +1,7 @@
 ########################################################################
 # Copyright (C) 2020		Sebastian Francisco Colomar Bauza
 # Copyright (C) 2020, 2021	Alejandro Colomar <alx.manpages@gmail.com>
+# Copyright (C) 2021		Ganimedes Colomar <gacoan.linux@gmail.com>
 # SPDX-License-Identifier:	GPL-2.0-only OR LGPL-2.0-only
 ########################################################################
 
