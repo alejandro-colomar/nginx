@@ -11,17 +11,5 @@ jobs:
                         name: checkout
                         uses: actions/checkout@v2
                 -
-                        name: make prereq
-                        run: sudo make prereq;
-                -
-                        name: make image-build
-                        run: make image-build lbl=ci;
-                -
-                        name: docker swarm init
-                        run: docker swarm init --advertise-addr lo;
-                -
-                        name: make stack-deploy
-                        run: sudo make stack-deploy node_role=manager;
-                -
-                        name: make test
-                        run: make test;
+                        name: run
+                        run: sudo make ci;
