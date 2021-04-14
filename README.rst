@@ -114,7 +114,7 @@ Deployment
 ==========
 
 Stable deployments use port 30080.
-Testing deployments use port 31001.
+Testing deployments use port 31080.
 
 For a seamless deployment, the following steps need to be done:
 
