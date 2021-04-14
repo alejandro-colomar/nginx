@@ -150,3 +150,14 @@ prereq-config:
 .PHONY: prereq-install
 prereq-install:
 	@$(MAKE) -C $(CURDIR)/src/alx/containers/;
+
+.PHONY: ci
+ci:
+	@echo '	DOCKER swarm init';
+	@sudo -u $(SUDO_USER) docker swarm init --advertise-addr lo 2>/dev/null ||:;
+	@$(MAKE) prereq;
+	@sudo -u $(SUDO_USER) $(MAKE) image-build lbl=ci;
+	@sudo -u $(SUDO_USER) $(MAKE) stack-rm ||:;
+	@sudo sleep 5;
+	@$(MAKE) stack-deploy node_role=manager;
+	@sudo -u $(SUDO_USER) $(MAKE) test;
