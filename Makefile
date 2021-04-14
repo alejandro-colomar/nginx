@@ -99,7 +99,7 @@ image-manifest-push:
 
 .PHONY: stack-deploy
 stack-deploy:
-	@echo '	STACK deploy';
+	@echo '	STACK deploy	$(stack)';
 	@export node_role='$(node_role)'; \
 	export image='$(repository)'; \
 	export label='$(lbl_)'; \
@@ -109,7 +109,7 @@ stack-deploy:
 
 .PHONY: stack-rm
 stack-rm:
-	@echo '	STACK rm';
+	@echo '	STACK rm	$(stack)';
 	@alx_stack_delete -o '$(orchestrator)' '$(stack)';
 
 .PHONY: test
