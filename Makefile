@@ -154,7 +154,7 @@ prereq-install:
 .PHONY: ci
 ci:
 	@echo '	DOCKER swarm init';
-	@sudo -u $(SUDO_USER) docker swarm init --advertise-addr lo 2>/dev/null ||:;
+	@sudo -u $(SUDO_USER) docker swarm init --advertise-addr lo >/dev/null 2>&1 ||:;
 	@$(MAKE) prereq;
 	@sudo -u $(SUDO_USER) $(MAKE) image-build lbl=ci;
 	@sudo -u $(SUDO_USER) $(MAKE) stack-rm ||:;
