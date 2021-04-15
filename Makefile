@@ -217,14 +217,14 @@ version:
 
 .PHONY: cd
 .SILENT: cd
-cd: checkout
+cd: cd_checkout
 	echo '	MAKE	image-manifest';
 	$(MAKE) image-manifest version=$(version_);
 	$(MAKE) cd_update_run;
 	echo '	GIT	tag & push';
 	git restore . >/dev/null;
 	git pull --rebase >/dev/null;
-	git tag -a 'v$(version)-1' -m 'Build $(img)' >/dev/null;
+	git tag -a 'v$(version_)-1' -m 'Build $(img)' >/dev/null;
 	git push --follow-tags >/dev/null;
 
 .PHONY: cd_arch
