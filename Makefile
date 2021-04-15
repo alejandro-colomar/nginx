@@ -139,7 +139,7 @@ test-curl:
 
 .PHONY: prereq
 prereq:
-	@sudo -u $(SUDO_USER) $(MAKE) prereq-config;
+	@sudo -Eu $(SUDO_USER) $(MAKE) prereq-config;
 	@$(MAKE) prereq-install;
 
 .PHONY: prereq-config
@@ -156,20 +156,20 @@ prereq-install:
 .PHONY: ci
 ci:
 	@echo '	DOCKER swarm init';
-	@sudo -u $(SUDO_USER) docker swarm init --advertise-addr lo >/dev/null 2>&1 ||:;
+	@sudo -Eu $(SUDO_USER) docker swarm init --advertise-addr lo >/dev/null 2>&1 ||:;
 	@echo;
 	@echo '	MAKE	prereq';
 	@$(MAKE) prereq;
 	@echo;
 	@echo '	MAKE	image-build';
-	@sudo -u $(SUDO_USER) $(MAKE) image-build lbl=ci;
+	@sudo -Eu $(SUDO_USER) $(MAKE) image-build lbl=ci;
 	@echo;
 	@echo '	MAKE	stack-deploy';
 	@$(MAKE) stack-deploy node_role=manager;
 	@echo;
 	@echo '	MAKE	test';
-	@sudo -u $(SUDO_USER) $(MAKE) test;
+	@sudo -Eu $(SUDO_USER) $(MAKE) test;
 	@echo;
 	@echo '	MAKE	stack-rm';
-	@sudo -u $(SUDO_USER) $(MAKE) stack-rm;
+	@sudo -Eu $(SUDO_USER) $(MAKE) stack-rm;
 	@echo;
