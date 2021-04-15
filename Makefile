@@ -161,10 +161,6 @@ ci:
 	@echo '	MAKE	prereq';
 	@$(MAKE) prereq;
 	@echo;
-	@echo '	MAKE	stack-rm';
-	@sudo -u $(SUDO_USER) $(MAKE) stack-rm ||:;
-	@sudo sleep 5;
-	@echo;
 	@echo '	MAKE	image-build';
 	@sudo -u $(SUDO_USER) $(MAKE) image-build lbl=ci;
 	@echo;
@@ -173,4 +169,7 @@ ci:
 	@echo;
 	@echo '	MAKE	test';
 	@sudo -u $(SUDO_USER) $(MAKE) test;
+	@echo;
+	@echo '	MAKE	stack-rm';
+	@sudo -u $(SUDO_USER) $(MAKE) stack-rm;
 	@echo;
