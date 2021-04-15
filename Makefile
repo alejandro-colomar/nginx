@@ -209,6 +209,9 @@ version:
 	echo '	GIT	branch & push';
 	git checkout -b 'version-$(version)' >/dev/null;
 	git push >/dev/null;
+	echo '	GIT	tag & push';
+	git tag -a 'v$(version)' -m 'Build $(img)' >/dev/null;
+	git push --follow-tags >/dev/null;
 
 .PHONY: cd
 .SILENT: cd
