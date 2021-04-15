@@ -6,6 +6,8 @@
 SHELL = bash
 
 version	= $(shell git describe --tags | sed 's/^v//')
+branch	= $(shell git rev-parse --abbrev-ref HEAD)
+remote	= $(shell git config --get branch.$(branch).remote)
 
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
@@ -208,7 +210,7 @@ version:
 	git push >/dev/null;
 	echo '	GIT	branch & push';
 	git checkout -b 'version-$(version)' >/dev/null;
-	git push >/dev/null;
+	git push -u $(remote) 'version-$(version)' >/dev/null;
 	echo '	GIT	tag & push';
 	git tag -a 'v$(version)' -m 'Build $(img)' >/dev/null;
 	git push --follow-tags >/dev/null;
