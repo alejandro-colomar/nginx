@@ -46,12 +46,14 @@ host_port	= $(shell <$(config) grep '^port' | grep '$(stability)' | cut -f3)
 retries	= 50
 
 .PHONY: all
+.SILENT: all
 all: image
 
 .PHONY: Dockerfile
+.SILENT: Dockerfile
 Dockerfile: $(nginx)
-	@echo '	Update Dockerfile ARGs';
-	@sed -i \
+	echo '	Update Dockerfile ARGs';
+	sed -i \
 		-e '/^ARG	NGINX_REG=/s/=.*/="$(nginx_reg)"/' \
 		-e '/^ARG	NGINX_USER=/s/=.*/="$(nginx_user)"/' \
 		-e '/^ARG	NGINX_REPO=/s/=.*/="$(nginx_repo)"/' \
@@ -60,21 +62,24 @@ Dockerfile: $(nginx)
 		$(CURDIR)/$@;
 
 .PHONY: image
+.SILENT: image
 image:
-	@$(MAKE) image-build;
-	@$(MAKE) image-push;
+	$(MAKE) image-build;
+	$(MAKE) image-push;
 
 .PHONY: image-build
+.SILENT: image-build
 image-build: Dockerfile $(image)
-	@echo '	DOCKER image build	$(img_a)';
-	@docker image build -t '$(img_a)' $(CURDIR) >/dev/null;
-	@sed -i  's/^lbl.*/lbl	$(lbl_a)/' $(image_);
-	@sed -Ei 's/^(digest	$(arch)).*/\1/' $(image_);
+	echo '	DOCKER image build	$(img_a)';
+	docker image build -t '$(img_a)' $(CURDIR) >/dev/null;
+	sed -i  's/^lbl.*/lbl	$(lbl_a)/' $(image_);
+	sed -Ei 's/^(digest	$(arch)).*/\1/' $(image_);
 
 .PHONY: image-push
+.SILENT: image-push
 image-push:
-	@echo '	DOCKER image push	$(img_a)';
-	@docker image push '$(img_a)' \
+	echo '	DOCKER image push	$(img_a)';
+	docker image push '$(img_a)' \
 	|grep 'digest:' \
 	|sed -E 's/.*digest: ([^ ]+) .*/\1/' \
 	|while read d; do \
@@ -82,25 +87,29 @@ image-push:
 	done;
 
 .PHONY: image-manifest
+.SILENT: image-manifest
 image-manifest:
-	@$(MAKE) image-manifest-create;
-	@$(MAKE) image-manifest-push;
+	$(MAKE) image-manifest-create;
+	$(MAKE) image-manifest-push;
 
 .PHONY: image-manifest-create
+.SILENT: image-manifest-create
 image-manifest-create:
-	@echo '	DOCKER manifest create	$(img)';
-	@docker manifest create '$(img)' $(imgs) >/dev/null;
-	@sed -Ei 's/^lbl.*/lbl	$(lbl)/' $(image_);
+	echo '	DOCKER manifest create	$(img)';
+	docker manifest create '$(img)' $(imgs) >/dev/null;
+	sed -Ei 's/^lbl.*/lbl	$(lbl)/' $(image_);
 
 .PHONY: image-manifest-push
+.SILENT: image-manifest-push
 image-manifest-push:
-	@echo '	DOCKER manifest push	$(img)';
-	@docker manifest push '$(img)' >/dev/null;
+	echo '	DOCKER manifest push	$(img)';
+	docker manifest push '$(img)' >/dev/null;
 
 .PHONY: stack-deploy
+.SILENT: stack-deploy
 stack-deploy:
-	@echo '	STACK deploy	$(stack)';
-	@export node_role='$(node_role)'; \
+	echo '	STACK deploy	$(stack)';
+	export node_role='$(node_role)'; \
 	export image='$(repository)'; \
 	export label='$(lbl_)'; \
 	export digest='$(digest_)'; \
@@ -108,29 +117,33 @@ stack-deploy:
 	alx_stack_deploy -o '$(orchestrator)' '$(stack)';
 
 .PHONY: stack-rm
+.SILENT: stack-rm
 stack-rm:
-	@echo '	STACK rm	$(stack)';
-	@alx_stack_delete -o '$(orchestrator)' '$(stack)';
+	echo '	STACK rm	$(stack)';
+	alx_stack_delete -o '$(orchestrator)' '$(stack)';
 
 .PHONY: test
+.SILENT: test
 test:
-	@$(MAKE) test-docker-service;
-	@$(MAKE) test-curl;
+	$(MAKE) test-docker-service;
+	$(MAKE) test-curl;
 
 .PHONY: test-docker-service
+.SILENT: test-docker-service
 test-docker-service:
-	@echo '	TEST	docker service';
-	@for ((i = 0; i < $(retries); i++)); do \
+	echo '	TEST	docker service';
+	for ((i = 0; i < $(retries); i++)); do \
 		sleep 1; \
 		docker service ls \
 		|grep -qE '([0-9])/\1' \
 		&& break; \
 	done;
 
-.PHONY: stack-test-curl
+.PHONY: test-curl
+.SILENT: test-curl
 test-curl:
-	@echo '	TEST	curl';
-	@for ((i = 0; i < $(retries); i++)); do \
+	echo '	TEST	curl';
+	for ((i = 0; i < $(retries); i++)); do \
 		sleep 1; \
 		curl -4s -o /dev/null -w '%{http_code}' localhost:$(host_port) \
 		|grep -q 200 \
@@ -138,38 +151,42 @@ test-curl:
 	done;
 
 .PHONY: prereq
+.SILENT: prereq
 prereq:
-	@sudo -Eu '$(SUDO_USER)' $(MAKE) prereq-config;
-	@$(MAKE) prereq-install;
+	sudo -Eu '$(SUDO_USER)' $(MAKE) prereq-config;
+	$(MAKE) prereq-install;
 
 .PHONY: prereq-config
+.SILENT: prereq-config
 prereq-config:
-	@echo '	GIT submodule init';
-	@git submodule init >/dev/null;
-	@echo '	GIT submodule update';
-	@git submodule update >/dev/null;
+	echo '	GIT submodule init';
+	git submodule init >/dev/null;
+	echo '	GIT submodule update';
+	git submodule update >/dev/null;
 
 .PHONY: prereq-install
+.SILENT: prereq-install
 prereq-install:
-	@$(MAKE) -C $(CURDIR)/src/alx/containers/;
+	$(MAKE) -C $(CURDIR)/src/alx/containers/;
 
 .PHONY: ci
+.SILENT: ci
 ci:
-	@echo '	DOCKER swarm init';
-	@sudo -Eu '$(SUDO_USER)' docker swarm init --advertise-addr lo >/dev/null 2>&1 ||:;
-	@echo;
-	@echo '	MAKE	prereq';
-	@$(MAKE) prereq;
-	@echo;
-	@echo '	MAKE	image-build';
-	@sudo -Eu '$(SUDO_USER)' $(MAKE) image-build lbl=ci;
-	@echo;
-	@echo '	MAKE	stack-deploy';
-	@$(MAKE) stack-deploy node_role=manager;
-	@echo;
-	@echo '	MAKE	test';
-	@sudo -Eu '$(SUDO_USER)' $(MAKE) test;
-	@echo;
-	@echo '	MAKE	stack-rm';
-	@sudo -Eu '$(SUDO_USER)' $(MAKE) stack-rm;
-	@echo;
+	echo '	DOCKER swarm init';
+	sudo -Eu '$(SUDO_USER)' docker swarm init --advertise-addr lo >/dev/null 2>&1 ||:;
+	echo;
+	echo '	MAKE	prereq';
+	$(MAKE) prereq;
+	echo;
+	echo '	MAKE	image-build';
+	sudo -Eu '$(SUDO_USER)' $(MAKE) image-build lbl=ci;
+	echo;
+	echo '	MAKE	stack-deploy';
+	$(MAKE) stack-deploy node_role=manager;
+	echo;
+	echo '	MAKE	test';
+	sudo -Eu '$(SUDO_USER)' $(MAKE) test;
+	echo;
+	echo '	MAKE	stack-rm';
+	sudo -Eu '$(SUDO_USER)' $(MAKE) stack-rm;
+	echo;
