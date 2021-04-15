@@ -3,7 +3,9 @@
 # Copyright (C) 2021		Alejandro Colomar <alx.manpages@gmail.com>
 # SPDX-License-Identifier:	GPL-2.0-only OR LGPL-2.0-only
 ########################################################################
-SHELL=bash
+SHELL = bash
+
+version	= $(shell git describe --tags | sed 's/^v//')
 
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
@@ -23,7 +25,7 @@ reg	= $(shell <$(image) grep '^reg' | cut -f2)
 user	= $(shell <$(image) grep '^user' | cut -f2)
 repo	= $(shell <$(image) grep '^repo' | cut -f2)
 repository = $(reg)/$(user)/$(repo)
-lbl	= $(shell git describe --tags | sed 's/^v//')
+lbl	= $(version)
 lbl_a	= $(lbl)_$(arch)
 img	= $(repository):$(lbl)
 img_a	= $(repository):$(lbl_a)
@@ -32,9 +34,13 @@ imgs	= $(addprefix $(img)_,$(archs))
 
 image_	= $(CURDIR)/run/docker/image
 lbl_	= $(shell <$(image_) grep '^lbl' |cut -f2)
+lbl_a_	= $(lbl_)_$(arch)
+img_	= $(repository):$(lbl_)
+img_a_	= $(repository):$(lbl_a_)
 digest	= $(shell <$(image_) grep '^digest' | grep '$(arch)' | cut -f3)
 digest_	= $(addprefix @,$(digest))
 
+version_	= $(shell <$(config) grep '^version' | cut -f2)
 orchestrator	= $(shell <$(config) grep '^orchest' | cut -f2)
 project		= $(shell <$(config) grep '^project' | cut -f2)
 stability	= $(shell <$(config) grep '^stable' | cut -f2)
@@ -97,7 +103,7 @@ image-manifest:
 image-manifest-create:
 	echo '	DOCKER manifest create	$(img)';
 	docker manifest create '$(img)' $(imgs) >/dev/null;
-	sed -Ei 's/^lbl.*/lbl	$(lbl)/' $(image_);
+	sed -i 's/^lbl.*/lbl	$(lbl)/' $(image_);
 
 .PHONY: image-manifest-push
 .SILENT: image-manifest-push
@@ -190,3 +196,52 @@ ci:
 	echo '	MAKE	stack-rm';
 	sudo -Eu '$(SUDO_USER)' $(MAKE) stack-rm;
 	echo;
+
+.PHONY: version
+.SILENT: version
+version:
+	echo '	CONFIG';
+	sed -i 's/^version.*/version	$(version)/' $(config);
+	echo '	GIT	commit & push';
+	git add $(config) >/dev/null;
+	git commit -m 'v$(version)' >/dev/null;
+	git push >/dev/null;
+	echo '	GIT	branch & push';
+	git checkout -b 'version-$(version)' >/dev/null;
+	git push >/dev/null;
+
+.PHONY: cd
+.SILENT: cd
+cd: checkout
+	echo '	MAKE	image-manifest';
+	$(MAKE) image-manifest version=$(version_);
+	echo '	GIT	commit & tag & push';
+	$(MAKE) cd_update_run;
+	git pull --rebase >/dev/null;
+	git tag -a 'v$(version)-1' -m 'Build $(img)' >/dev/null;
+	git push --follow-tags >/dev/null;
+
+.PHONY: cd_arch
+.SILENT: cd_arch
+cd_arch: cd_checkout
+	echo '	MAKE	image';
+	$(MAKE) image version=$(version_);
+	echo '	GIT	commit & push';
+	$(MAKE) cd_update_run;
+	git pull --rebase >/dev/null;
+	git push >/dev/null;
+
+.PHONY: cd_checkout
+.SILENT: cd_checkout
+cd_checkout:
+	echo '	GIT	checkout version-$(version_)';
+	git fetch >/dev/null;
+	git checkout -f 'version-$(version_)' >/dev/null;
+	git pull --ff-only >/dev/null;
+
+.PHONY: cd_update_run
+.SILENT: cd_update_run
+cd_update_run:
+	echo '	GIT	commit';
+	git add $(image_) >/dev/null;
+	git commit -m 'Build $(img_a_)' >/dev/null;

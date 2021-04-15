@@ -39,73 +39,31 @@ Release a new version
 =====================
 
 
-Create an 'rc' tag
-^^^^^^^^^^^^^^^^^^
-
-.. code-block:: BASH
-
-	version="X.Y.Z-alpine-alxA";	# X, Y, Z, and A are numbers
-	extraversion="-rc";
-	tagrc="v${version}${extraversion}";
-
-	git tag "${tagrc}";
-	git push origin "${tagrc}";
-
-
-Build a docker image
+Create a new version
 ^^^^^^^^^^^^^^^^^^^^
 
-Build a docker image with the version (no extraversion), for every supported
-architecture (this needs to be run from many machines):
+.. code-block:: BASH
+
+	make version version='X.Y.Z-alpine-alxA'; # X, Y, Z, and A are numbers
+
+
+Build and push architecture-specific objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Build a docker image for every supported architecture (this needs to be
+run from many machines).
 
 .. code-block:: BASH
 
-	version="X.Y.Z-alpine-alxA";
-	extraversion="-rc";
-	tagrc="v${version}${extraversion}";
-
-	git fetch --tags;
-	git checkout "${tagrc}";
-	make image lbl="${version}";
+	make cd_arch;
 
 
-Store the sha256 checksums
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Every one of the architectures above will store the sha256 checksum of
-the image in ``<./run/docker/image>``.  Store all of those in that file.
-
-Create a multi-arch docker image manifest
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Build and push multi-arch objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: BASH
 
-	make image-manifest lbl="${version}";
-
-
-Store the docker image manifest label
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The command above will have stored the label of the manifest in
-``<./run/docker/image>``.  Push a commit with that (squashing all of the
-commits created in step 3 into this one is nicer).
-
-.. code-block:: BASH
-
-	tag="v${version}";
-
-	git add run/docker/image
-	git commit -sm "${tag}";
-	git push;
-
-
-Release
-^^^^^^^
-
-.. code-block:: BASH
-
-	git tag -a "${tag}" -m '';
-	git push origin "${tag}";
+	make cd;
 
 
 ________________________________________________________________________
