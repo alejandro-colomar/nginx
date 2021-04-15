@@ -55,7 +55,7 @@ run from many machines).
 
 .. code-block:: BASH
 
-	make cd_arch;
+	make cd-arch;
 
 
 Build and push multi-arch objects

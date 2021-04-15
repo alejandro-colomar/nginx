@@ -215,38 +215,38 @@ version:
 
 .PHONY: cd
 .SILENT: cd
-cd: cd_checkout
+cd: cd-checkout
 	echo '	MAKE	image-manifest';
 	$(MAKE) image-manifest version=$(version_);
-	$(MAKE) cd_update_run;
+	$(MAKE) cd-update-run;
 	echo '	GIT	tag & push';
 	git restore . >/dev/null;
 	git pull --rebase >/dev/null;
 	git tag -a 'v$(version_)-1' -m 'Build $(img)' >/dev/null;
 	git push --follow-tags >/dev/null;
 
-.PHONY: cd_arch
-.SILENT: cd_arch
-cd_arch: cd_checkout
+.PHONY: cd-arch
+.SILENT: cd-arch
+cd-arch: cd-checkout
 	echo '	MAKE	image';
 	$(MAKE) image version=$(version_);
-	$(MAKE) cd_update_run;
+	$(MAKE) cd-update-run;
 	echo '	GIT	push';
 	git restore . >/dev/null;
 	git pull --rebase >/dev/null;
 	git push >/dev/null;
 
-.PHONY: cd_checkout
-.SILENT: cd_checkout
-cd_checkout:
+.PHONY: cd-checkout
+.SILENT: cd-checkout
+cd-checkout:
 	echo '	GIT	checkout version-$(version_)';
 	git fetch >/dev/null;
 	git checkout -f 'version-$(version_)' >/dev/null;
 	git pull --ff-only >/dev/null;
 
-.PHONY: cd_update_run
-.SILENT: cd_update_run
-cd_update_run:
+.PHONY: cd-update-run
+.SILENT: cd-update-run
+cd-update-run:
 	echo '	GIT	commit';
 	git add $(image_) >/dev/null;
 	git commit -m 'Build $(img_)' >/dev/null;
