@@ -30,7 +30,7 @@ any changes:
 
 .. code-block:: BASH
 
-	sudo make ci;
+	sudo -E make ci;
 
 
 ________________________________________________________________________
