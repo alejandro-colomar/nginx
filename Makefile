@@ -36,9 +36,7 @@ imgs	= $(addprefix $(img)_,$(archs))
 
 image_	= $(CURDIR)/run/docker/image
 lbl_	= $(shell <$(image_) grep '^lbl' |cut -f2)
-lbl_a_	= $(lbl_)_$(arch)
 img_	= $(repository):$(lbl_)
-img_a_	= $(repository):$(lbl_a_)
 digest	= $(shell <$(image_) grep '^digest' | grep '$(arch)' | cut -f3)
 digest_	= $(addprefix @,$(digest))
 
@@ -251,4 +249,4 @@ cd_checkout:
 cd_update_run:
 	echo '	GIT	commit';
 	git add $(image_) >/dev/null;
-	git commit -m 'Build $(img_a_)' >/dev/null;
+	git commit -m 'Build $(img_)' >/dev/null;
