@@ -220,8 +220,9 @@ version:
 cd: checkout
 	echo '	MAKE	image-manifest';
 	$(MAKE) image-manifest version=$(version_);
-	echo '	GIT	commit & tag & push';
 	$(MAKE) cd_update_run;
+	echo '	GIT	tag & push';
+	git restore . >/dev/null;
 	git pull --rebase >/dev/null;
 	git tag -a 'v$(version)-1' -m 'Build $(img)' >/dev/null;
 	git push --follow-tags >/dev/null;
@@ -231,8 +232,9 @@ cd: checkout
 cd_arch: cd_checkout
 	echo '	MAKE	image';
 	$(MAKE) image version=$(version_);
-	echo '	GIT	commit & push';
 	$(MAKE) cd_update_run;
+	echo '	GIT	push';
+	git restore . >/dev/null;
 	git pull --rebase >/dev/null;
 	git push >/dev/null;
 
