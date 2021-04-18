@@ -100,7 +100,8 @@ For a seamless deployment, the following steps need to be done:
 
 
 - Else, if the new deployment is good enough, the published port should be
-  forwarded to 31080 (this is done in the DNS or whatever method is preferred).
+  forwarded to 31080 (this is done in the load balancer or whatever method
+  is preferred).
 
 - Remove the oldstable deployment, and deploy the new version at port 30080:
 
@@ -111,7 +112,7 @@ For a seamless deployment, the following steps need to be done:
 
 
 - The published port should be forwarded back to 30080 (this is done again
-  in the DNS or whatever method is preferred).
+  in the load balancer or whatever method is preferred).
 
 - Remove the test deployment at port 31080:
 
