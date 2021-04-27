@@ -73,7 +73,7 @@ image:
 .PHONY: image-build
 image-build: Dockerfile $(image)
 	@echo '	DOCKER image build	$(img_a)';
-	docker image build -t '$(img_a)' $(CURDIR) >/dev/null;
+	docker image build -t '$(img_a)' $(CURDIR);
 	sed -i  's/^lbl.*/lbl	$(lbl_a)/' $(image_);
 	sed -Ei 's/^(digest	$(arch)).*/\1/' $(image_);
 
@@ -95,13 +95,13 @@ image-manifest:
 .PHONY: image-manifest-create
 image-manifest-create:
 	@echo '	DOCKER manifest create	$(img)';
-	docker manifest create '$(img)' $(imgs) >/dev/null;
+	docker manifest create '$(img)' $(imgs);
 	sed -i 's/^lbl.*/lbl	$(lbl)/' $(image_);
 
 .PHONY: image-manifest-push
 image-manifest-push:
 	@echo '	DOCKER manifest push	$(img)';
-	docker manifest push '$(img)' >/dev/null;
+	docker manifest push '$(img)';
 
 .PHONY: stack-deploy
 stack-deploy:
@@ -151,9 +151,9 @@ prereq:
 .PHONY: prereq-config
 prereq-config:
 	@echo '	GIT submodule init';
-	git submodule init >/dev/null;
+	git submodule init;
 	@echo '	GIT submodule update';
-	git submodule update >/dev/null;
+	git submodule update;
 
 .PHONY: prereq-install
 prereq-install:
@@ -162,7 +162,7 @@ prereq-install:
 .PHONY: ci
 ci:
 	@echo '	DOCKER swarm init';
-	sudo -Eu '$(SUDO_USER)' docker swarm init --advertise-addr lo >/dev/null 2>&1 ||:;
+	sudo -Eu '$(SUDO_USER)' docker swarm init --advertise-addr lo ||:;
 	@echo;
 	@echo '	MAKE	prereq';
 	$(MAKE) prereq;
@@ -185,15 +185,15 @@ version:
 	@echo '	CONFIG';
 	sed -i 's/^version.*/version	$(version)/' $(config);
 	@echo '	GIT	commit & push';
-	git add $(config) >/dev/null;
-	git commit -m 'v$(version)' >/dev/null;
-	git push >/dev/null;
+	git add $(config);
+	git commit -m 'v$(version)';
+	git push;
 	@echo '	GIT	branch & push';
-	git checkout -b 'version-$(version)' >/dev/null;
-	git push -u $(remote) 'version-$(version)' >/dev/null;
+	git checkout -b 'version-$(version)';
+	git push -u $(remote) 'version-$(version)';
 	@echo '	GIT	tag & push';
-	git tag -a 'v$(version)' -m 'Build $(img)' >/dev/null;
-	git push --follow-tags >/dev/null;
+	git tag -a 'v$(version)' -m 'Build $(img)';
+	git push --follow-tags;
 
 .PHONY: cd
 cd: cd-checkout
@@ -201,10 +201,10 @@ cd: cd-checkout
 	$(MAKE) image-manifest version=$(version_);
 	$(MAKE) cd-update-run;
 	@echo '	GIT	tag & push';
-	git restore . >/dev/null;
-	git pull --rebase >/dev/null;
-	git tag -a 'v$(version_)-1' -m 'Build $(img)' >/dev/null;
-	git push --follow-tags >/dev/null;
+	git restore .;
+	git pull --rebase;
+	git tag -a 'v$(version_)-1' -m 'Build $(img)';
+	git push --follow-tags;
 
 .PHONY: cd-arch
 cd-arch: cd-checkout
@@ -212,19 +212,19 @@ cd-arch: cd-checkout
 	$(MAKE) image version=$(version_);
 	$(MAKE) cd-update-run;
 	@echo '	GIT	push';
-	git restore . >/dev/null;
-	git pull --rebase >/dev/null;
-	git push >/dev/null;
+	git restore .;
+	git pull --rebase;
+	git push;
 
 .PHONY: cd-checkout
 cd-checkout:
 	@echo '	GIT	checkout version-$(version_)';
-	git fetch >/dev/null;
-	git checkout -f 'version-$(version_)' >/dev/null;
-	git pull --ff-only >/dev/null;
+	git fetch;
+	git checkout -f 'version-$(version_)';
+	git pull --ff-only;
 
 .PHONY: cd-update-run
 cd-update-run:
 	@echo '	GIT	commit';
-	git add $(image_) >/dev/null;
-	git commit -m 'Build $(img_)' >/dev/null;
+	git add $(image_);
+	git commit -m 'Build $(img_)';
