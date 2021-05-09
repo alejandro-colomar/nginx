@@ -59,7 +59,7 @@ image_:
 	git pull --ff-only;
 	$(MAKE) -C $(LIBEXECDIR) -f img.mk image version=$(version_);
 	$(MAKE) -C $(LIBEXECDIR) -f img.mk update-run;
-	git restore .;
+	git restore $(ROOTDIR);
 	git pull --rebase;
 	git push;
 
@@ -94,7 +94,7 @@ image-manifest_:
 	git pull --ff-only;
 	$(MAKE) -C $(LIBEXECDIR) -f img.mk image-manifest version=$(version_);
 	$(MAKE) -C $(LIBEXECDIR) -f img.mk update-run;
-	git restore .;
+	git restore $(ROOTDIR);
 	git pull --rebase;
 	git tag -a 'v$(version_)-1' -m 'Build $(img)';
 	git push --follow-tags;
