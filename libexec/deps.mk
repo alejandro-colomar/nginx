@@ -16,7 +16,7 @@ deps-build: basic-deps
 	chmod 755 . && \
 	equivs-build $(ROOTDIR)/etc/debian/build-deps 2>/dev/null \
 	| grep '^dpkg-deb' \
-	| grep -o "\./.*\.deb" \
+	| grep -o '\./.*\.deb' \
 	| xargs sudo apt-get install --no-install-recommends -y -q=2;
 
 .PHONY: deps-run
@@ -25,7 +25,7 @@ deps-run: submodules basic-deps
 	chmod 755 . && \
 	equivs-build $(ROOTDIR)/etc/debian/run-deps 2>/dev/null \
 	| grep '^dpkg-deb' \
-	| grep -o "\./.*\.deb" \
+	| grep -o '\./.*\.deb' \
 	| xargs sudo apt-get install --no-install-recommends -y -q=2;
 
 .PHONY: submodules
