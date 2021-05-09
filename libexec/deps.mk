@@ -7,8 +7,8 @@ SHELL = /bin/bash -Eeuo pipefail
 
 .PHONY: all
 all:
-	$(MAKE) -C $(LIBEXECDIR) -f deps.mk deps-build;
-	$(MAKE) -C $(LIBEXECDIR) -f deps.mk deps-run;
+	$(MAKE) -f deps.mk deps-build;
+	$(MAKE) -f deps.mk deps-run;
 
 .PHONY: deps-build
 deps-build: basic-deps

@@ -5,8 +5,6 @@
 ########################################################################
 SHELL = /bin/bash -Eeuo pipefail
 
-LIBEXECDIR = $(ROOTDIR)/libexec
-
 config		= $(ROOTDIR)/.config
 stability	= $(shell <$(config) grep '^stable' | cut -f2)
 host_port	= $(shell <$(config) grep '^port' | grep '$(stability)' | cut -f3)
@@ -22,26 +20,26 @@ test:
 	sudo -Eu '$(SUDO_USER)' docker swarm init --advertise-addr lo ||:;
 	@echo;
 	@echo '	MAKE	deps';
-	$(MAKE) -C $(LIBEXECDIR) -f deps.mk;
+	$(MAKE) -f deps.mk;
 	@echo;
 	@echo '	MAKE	image-build';
-	sudo -Eu '$(SUDO_USER)' $(MAKE) -C $(LIBEXECDIR) -f img.mk image-build lbl=ci;
+	sudo -Eu '$(SUDO_USER)' $(MAKE) -f img.mk image-build lbl=ci;
 	@echo;
 	@echo '	MAKE	stack-deploy';
-	$(MAKE) -C $(LIBEXECDIR) -f stack.mk stack-deploy node_role=manager;
+	$(MAKE) -f stack.mk stack-deploy node_role=manager;
 	@echo;
 	@echo '	MAKE	run-tests';
 	echo 'asd$(CURDIR)asd'
-	sudo -Eu '$(SUDO_USER)' $(MAKE) -C $(LIBEXECDIR) -f test.mk run-tests;
+	sudo -Eu '$(SUDO_USER)' $(MAKE) -f test.mk run-tests;
 	@echo;
 	@echo '	MAKE	stack-rm';
-	sudo -Eu '$(SUDO_USER)' $(MAKE) -C $(LIBEXECDIR) -f stack.mk stack-rm;
+	sudo -Eu '$(SUDO_USER)' $(MAKE) -f stack.mk stack-rm;
 	@echo;
 
 .PHONY: run-tests
 run-tests:
-	$(MAKE) -C $(LIBEXECDIR) -f test.mk run-test-docker-service;
-	$(MAKE) -C $(LIBEXECDIR) -f test.mk run-test-curl;
+	$(MAKE) -f test.mk run-test-docker-service;
+	$(MAKE) -f test.mk run-test-curl;
 
 .PHONY: run-test-docker-service
 run-test-docker-service:

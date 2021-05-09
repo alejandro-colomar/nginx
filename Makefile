@@ -11,7 +11,6 @@ MAKEFLAGS += --no-print-directory
 ROOTDIR		= $(CURDIR)
 LIBEXECDIR	= $(ROOTDIR)/libexec
 export ROOTDIR
-export LIBEXECDIR
 
 .PHONY: all
 all: image

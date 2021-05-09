@@ -57,8 +57,8 @@ image_:
 	git checkout -f 'version-$(version_)';
 	git clean -fx;
 	git pull --ff-only;
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk image version=$(version_);
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk update-run;
+	$(MAKE) -f img.mk image version=$(version_);
+	$(MAKE) -f img.mk update-run;
 	git restore $(ROOTDIR);
 	git pull --rebase;
 	git push;
@@ -66,8 +66,8 @@ image_:
 
 .PHONY: image
 image:
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk image-build;
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk image-push;
+	$(MAKE) -f img.mk image-build;
+	$(MAKE) -f img.mk image-push;
 
 .PHONY: image-build
 image-build: Dockerfile $(image)
@@ -92,8 +92,8 @@ image-manifest_:
 	git checkout -f 'version-$(version_)';
 	git clean -fx;
 	git pull --ff-only;
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk image-manifest version=$(version_);
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk update-run;
+	$(MAKE) -f img.mk image-manifest version=$(version_);
+	$(MAKE) -f img.mk update-run;
 	git restore $(ROOTDIR);
 	git pull --rebase;
 	git tag -a 'v$(version_)-1' -m 'Build $(img)';
@@ -101,8 +101,8 @@ image-manifest_:
 
 .PHONY: image-manifest
 image-manifest:
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk image-manifest-create;
-	$(MAKE) -C $(LIBEXECDIR) -f img.mk image-manifest-push;
+	$(MAKE) -f img.mk image-manifest-create;
+	$(MAKE) -f img.mk image-manifest-push;
 
 .PHONY: image-manifest-create
 image-manifest-create:
