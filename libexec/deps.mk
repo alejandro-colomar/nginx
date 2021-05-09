@@ -17,7 +17,7 @@ deps-build:
 	equivs-build $(ROOTDIR)/etc/debian/build-deps 2>/dev/null \
 	| grep '^dpkg-deb' \
 	| grep -o "\./.*\.deb" \
-	| xargs sudo apt-get install;
+	| xargs sudo apt-get install -y;
 
 .PHONY: deps-run
 deps-run: submodules
@@ -26,7 +26,7 @@ deps-run: submodules
 	equivs-build $(ROOTDIR)/etc/debian/run-deps 2>/dev/null \
 	| grep '^dpkg-deb' \
 	| grep -o "\./.*\.deb" \
-	| xargs sudo apt-get install;
+	| xargs sudo apt-get install -y;
 
 .PHONY: submodules
 submodules:
