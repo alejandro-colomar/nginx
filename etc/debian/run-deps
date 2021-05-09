@@ -1,0 +1,11 @@
+Standards-Version: 4.5.0
+
+Package: nginx-alx-run-deps
+Depends:
+	bash,
+	coreutils,
+	docker.io | docker-ce,
+	grep,
+	make,
+	sed,
+	sudo

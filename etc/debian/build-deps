@@ -1,0 +1,11 @@
+Standards-Version: 4.5.0
+
+Package: nginx-alx-build-deps
+Depends:
+	bash,
+	docker.io | docker-ce,
+	git,
+	grep,
+	make,
+	sed,
+	sudo

@@ -30,7 +30,7 @@ any changes:
 
 .. code-block:: BASH
 
-	sudo -E make ci;
+	sudo -E make test;
 
 
 ________________________________________________________________________
@@ -55,7 +55,7 @@ run from many machines).
 
 .. code-block:: BASH
 
-	make cd-arch;
+	make image_;
 
 
 Build and push multi-arch objects
@@ -63,7 +63,7 @@ Build and push multi-arch objects
 
 .. code-block:: BASH
 
-	make cd;
+	make image-manifest_;
 
 
 ________________________________________________________________________

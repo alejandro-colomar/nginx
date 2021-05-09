@@ -3,228 +3,70 @@
 # Copyright (C) 2021		Alejandro Colomar <alx.manpages@gmail.com>
 # SPDX-License-Identifier:	GPL-2.0-only OR LGPL-2.0-only
 ########################################################################
-SHELL = bash
-
-version	= $(shell git describe --tags | sed 's/^v//')
-branch	= $(shell git rev-parse --abbrev-ref HEAD)
-remote	= $(shell git config --get branch.$(branch).remote)
+SHELL = /bin/bash -Eeuo pipefail
 
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
 
-arch	= $(shell uname -m)
-config	= $(CURDIR)/.config
-
-nginx		= $(CURDIR)/etc/docker/image.d/nginx
-nginx_reg	= $(shell <$(nginx) grep '^reg' | cut -f2)
-nginx_user	= $(shell <$(nginx) grep '^user' | cut -f2)
-nginx_repo	= $(shell <$(nginx) grep '^repo' | cut -f2)
-nginx_lbl	= $(shell <$(nginx) grep '^lbl' | cut -f2)
-nginx_digest	= $(shell <$(nginx) grep '^digest' | grep '$(arch)' | cut -f3)
-
-image	= $(CURDIR)/etc/docker/image
-reg	= $(shell <$(image) grep '^reg' | cut -f2)
-user	= $(shell <$(image) grep '^user' | cut -f2)
-repo	= $(shell <$(image) grep '^repo' | cut -f2)
-repository = $(reg)/$(user)/$(repo)
-lbl	= $(version)
-lbl_a	= $(lbl)_$(arch)
-img	= $(repository):$(lbl)
-img_a	= $(repository):$(lbl_a)
-archs	= $(shell <$(config) grep '^archs' | cut -f2 | tr ',' ' ')
-imgs	= $(addprefix $(img)_,$(archs))
-
-image_	= $(CURDIR)/run/docker/image
-lbl_	= $(shell <$(image_) grep '^lbl' |cut -f2)
-img_	= $(repository):$(lbl_)
-digest	= $(shell <$(image_) grep '^digest' | grep '$(arch)' | cut -f3)
-digest_	= $(addprefix @,$(digest))
-
-version_	= $(shell <$(config) grep '^version' | cut -f2)
-orchestrator	= $(shell <$(config) grep '^orchest' | cut -f2)
-project		= $(shell <$(config) grep '^project' | cut -f2)
-stability	= $(shell <$(config) grep '^stable' | cut -f2)
-stack		= $(project)-$(stability)
-node_role	= $(shell <$(config) grep '^node' | cut -f2)
-host_port	= $(shell <$(config) grep '^port' | grep '$(stability)' | cut -f3)
-
-# Testing
-retries	= 50
+ROOTDIR		= $(CURDIR)
+LIBEXECDIR	= $(ROOTDIR)/libexec
+export ROOTDIR
+export LIBEXECDIR
 
 .PHONY: all
 all: image
 
-.PHONY: Dockerfile
-Dockerfile: $(nginx)
-	@echo '	Update Dockerfile ARGs';
-	sed -i \
-		-e '/^ARG	NGINX_REG=/s/=.*/="$(nginx_reg)"/' \
-		-e '/^ARG	NGINX_USER=/s/=.*/="$(nginx_user)"/' \
-		-e '/^ARG	NGINX_REPO=/s/=.*/="$(nginx_repo)"/' \
-		-e '/^ARG	NGINX_LBL=/s/=.*/="$(nginx_lbl)"/' \
-		-e '/^ARG	NGINX_DIGEST=/s/=.*/="$(nginx_digest)"/' \
-		$(CURDIR)/$@;
+########################################################################
+# ./libexec/deps.mk
+
+.PHONY: deps-build
+deps-build:
+	$(MAKE) -C $(CURDIR)/libexec -f deps.mk $@;
+
+.PHONY: deps-run
+deps-run:
+	$(MAKE) -C $(CURDIR)/libexec -f deps.mk $@;
+
+########################################################################
+# ./libexec/img.mk
+
+.PHONY: image_
+image_:
+	$(MAKE) -C $(CURDIR)/libexec -f img.mk $@;
 
 .PHONY: image
 image:
-	$(MAKE) image-build;
-	$(MAKE) image-push;
+	$(MAKE) -C $(CURDIR)/libexec -f img.mk $@;
 
-.PHONY: image-build
-image-build: Dockerfile $(image)
-	@echo '	DOCKER image build	$(img_a)';
-	docker image build -t '$(img_a)' $(CURDIR);
-	sed -i  's/^lbl.*/lbl	$(lbl_a)/' $(image_);
-	sed -Ei 's/^(digest	$(arch)).*/\1/' $(image_);
-
-.PHONY: image-push
-image-push:
-	@echo '	DOCKER image push	$(img_a)';
-	docker image push '$(img_a)' \
-	|grep 'digest:' \
-	|sed -E 's/.*digest: ([^ ]+) .*/\1/' \
-	|while read d; do \
-		sed -Ei "s/^(digest	$(arch)).*/\1	$${d}/" $(image_); \
-	done;
+.PHONY: image-manifest_
+image-manifest_:
+	$(MAKE) -C $(CURDIR)/libexec -f img.mk $@;
 
 .PHONY: image-manifest
 image-manifest:
-	$(MAKE) image-manifest-create;
-	$(MAKE) image-manifest-push;
+	$(MAKE) -C $(CURDIR)/libexec -f img.mk $@;
 
-.PHONY: image-manifest-create
-image-manifest-create:
-	@echo '	DOCKER manifest create	$(img)';
-	docker manifest create '$(img)' $(imgs);
-	sed -i 's/^lbl.*/lbl	$(lbl)/' $(image_);
-
-.PHONY: image-manifest-push
-image-manifest-push:
-	@echo '	DOCKER manifest push	$(img)';
-	docker manifest push '$(img)';
-
-.PHONY: stack-deploy
-stack-deploy:
-	@echo '	STACK deploy	$(stack)';
-	export node_role='$(node_role)'; \
-	export image='$(repository)'; \
-	export label='$(lbl_)'; \
-	export digest='$(digest_)'; \
-	export host_port='$(host_port)'; \
-	alx_stack_deploy -o '$(orchestrator)' '$(stack)';
-
-.PHONY: stack-rm
-stack-rm:
-	@echo '	STACK rm	$(stack)';
-	alx_stack_delete -o '$(orchestrator)' '$(stack)';
+########################################################################
+# ./libexec/test.mk
 
 .PHONY: test
 test:
-	$(MAKE) test-docker-service;
-	$(MAKE) test-curl;
+	$(MAKE) -C $(CURDIR)/libexec -f test.mk $@;
 
-.PHONY: test-docker-service
-test-docker-service:
-	@echo '	TEST	docker service';
-	for ((i = 0; i < $(retries); i++)); do \
-		sleep 1; \
-		docker service ls \
-		|grep -qE '([0-9])/\1' \
-		&& break; \
-	done;
+########################################################################
+# ./libexec/stack.mk
 
-.PHONY: test-curl
-test-curl:
-	@echo '	TEST	curl';
-	for ((i = 0; i < $(retries); i++)); do \
-		sleep 1; \
-		curl -4s -o /dev/null -w '%{http_code}' localhost:$(host_port) \
-		|grep -q 200 \
-		&& break; \
-	done;
+.PHONY: stack-deploy
+stack-deploy:
+	$(MAKE) -C $(CURDIR)/libexec -f stack.mk $@;
 
-.PHONY: prereq
-prereq:
-	sudo -Eu '$(SUDO_USER)' $(MAKE) prereq-config;
-	$(MAKE) prereq-install;
+.PHONY: stack-rm
+stack-rm:
+	$(MAKE) -C $(CURDIR)/libexec -f stack.mk $@;
 
-.PHONY: prereq-config
-prereq-config:
-	@echo '	GIT submodule init';
-	git submodule init;
-	@echo '	GIT submodule update';
-	git submodule update;
-
-.PHONY: prereq-install
-prereq-install:
-	$(MAKE) -C $(CURDIR)/src/alx/containers/;
-
-.PHONY: ci
-ci:
-	@echo '	DOCKER swarm init';
-	sudo -Eu '$(SUDO_USER)' docker swarm init --advertise-addr lo ||:;
-	@echo;
-	@echo '	MAKE	prereq';
-	$(MAKE) prereq;
-	@echo;
-	@echo '	MAKE	image-build';
-	sudo -Eu '$(SUDO_USER)' $(MAKE) image-build lbl=ci;
-	@echo;
-	@echo '	MAKE	stack-deploy';
-	$(MAKE) stack-deploy node_role=manager;
-	@echo;
-	@echo '	MAKE	test';
-	sudo -Eu '$(SUDO_USER)' $(MAKE) test;
-	@echo;
-	@echo '	MAKE	stack-rm';
-	sudo -Eu '$(SUDO_USER)' $(MAKE) stack-rm;
-	@echo;
+########################################################################
+# ./libexec/version.mk
 
 .PHONY: version
 version:
-	@echo '	CONFIG';
-	sed -i 's/^version.*/version	$(version)/' $(config);
-	@echo '	GIT	commit & push';
-	git add $(config);
-	git commit -m 'v$(version)';
-	git push;
-	@echo '	GIT	branch & push';
-	git checkout -b 'version-$(version)';
-	git push -u $(remote) 'version-$(version)';
-	@echo '	GIT	tag & push';
-	git tag -a 'v$(version)' -m 'Build $(img)';
-	git push --follow-tags;
-
-.PHONY: cd
-cd: cd-checkout
-	@echo '	MAKE	image-manifest';
-	$(MAKE) image-manifest version=$(version_);
-	$(MAKE) cd-update-run;
-	@echo '	GIT	tag & push';
-	git restore .;
-	git pull --rebase;
-	git tag -a 'v$(version_)-1' -m 'Build $(img)';
-	git push --follow-tags;
-
-.PHONY: cd-arch
-cd-arch: cd-checkout
-	@echo '	MAKE	image';
-	$(MAKE) image version=$(version_);
-	$(MAKE) cd-update-run;
-	@echo '	GIT	push';
-	git restore .;
-	git pull --rebase;
-	git push;
-
-.PHONY: cd-checkout
-cd-checkout:
-	@echo '	GIT	checkout version-$(version_)';
-	git fetch;
-	git checkout -f 'version-$(version_)';
-	git pull --ff-only;
-
-.PHONY: cd-update-run
-cd-update-run:
-	@echo '	GIT	commit';
-	git add $(image_);
-	git commit -m 'Build $(img_)';
+	$(MAKE) -C $(CURDIR)/libexec -f version.mk $@;
