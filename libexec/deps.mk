@@ -11,7 +11,7 @@ all:
 	$(MAKE) -C $(LIBEXECDIR) -f deps.mk deps-run;
 
 .PHONY: deps-build
-deps-build:
+deps-build: basic-deps
 	cd $$(mktemp -d) && \
 	chmod 755 . && \
 	equivs-build $(ROOTDIR)/etc/debian/build-deps 2>/dev/null \
@@ -20,7 +20,7 @@ deps-build:
 	| xargs sudo apt-get install --no-install-recommends -y;
 
 .PHONY: deps-run
-deps-run: submodules
+deps-run: submodules basic-deps
 	cd $$(mktemp -d) && \
 	chmod 755 . && \
 	equivs-build $(ROOTDIR)/etc/debian/run-deps 2>/dev/null \
@@ -33,3 +33,7 @@ submodules:
 	sudo -Eu '$(SUDO_USER)' git submodule init;
 	sudo -Eu '$(SUDO_USER)' git submodule update;
 	$(MAKE) -C $(ROOTDIR)/src/alx/containers/;
+
+.PHONY: basic-deps
+basic-deps:
+	apt-get install --no-install-recommends -y equivs;
