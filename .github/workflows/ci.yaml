@@ -11,5 +11,8 @@ jobs:
                         name: checkout
                         uses: actions/checkout@v2
                 -
+                        name: Fix dependencies for github runner
+                        run: sudo sed -i '/docker/d' etc/debian/*;
+                -
                         name: run
                         run: sudo -E make test;
