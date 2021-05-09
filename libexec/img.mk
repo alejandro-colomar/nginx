@@ -38,7 +38,7 @@ lbl_	= $(shell <$(image_) grep '^lbl' | cut -f2)
 img_	= $(repository):$(lbl_)
 
 .PHONY: all
-all: image
+all: image_
 
 .PHONY: Dockerfile
 Dockerfile:
