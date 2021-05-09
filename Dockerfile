@@ -7,8 +7,8 @@
 
 
 ########################################################################
-ARG	NGINX_DIGEST="sha256:4fe11ac2b8ee14157911dd2029b6e30b7aed3888f4549e733aa51930a4af52af"
-ARG	NGINX_LBL="1.19.9-alpine"
+ARG	NGINX_DIGEST="sha256:55684c622b7b62045bd4578e402704bdd1923f6ab704f57134e712c2f1da48c8"
+ARG	NGINX_LBL="1.20.0-alpine"
 ARG	NGINX_REG="docker.io"
 ARG	NGINX_REPO="nginx"
 ARG	NGINX_USER="library"
