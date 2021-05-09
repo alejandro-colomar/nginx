@@ -4,19 +4,40 @@ to be used by other projects.
 
 ________________________________________________________________________
 
-Prerequisites
-=============
+Dependencies
+============
 
 
-The basic software needed to be able to build, run, and test this software
-is (the following names are those of the packages in Debian):
+The dependencies of this project can be installed on a Debian system by
+running the following commands:
 
-* bash
-* coreutils
-* docker.io
-* git
-* make
+For the dependencies required to build the images:
 
+.. code-block:: BASH
+
+	sudo make deps-build;
+
+For the dependencies required to run the containers:
+
+.. code-block:: BASH
+
+	sudo make deps-run;
+
+
+________________________________________________________________________
+
+Upgrading nginx base image
+==========================
+
+
+To update the nginx base image, update the fields ``lbl`` and ``digest``
+in ``<./etc/docer/image.d/nginx>``, and the run the following command:
+
+.. code-block:: BASH
+
+	make Dockerfile;
+
+After that, you should probably make a commit.
 
 ________________________________________________________________________
 
