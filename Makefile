@@ -30,6 +30,10 @@ deps-run:
 ########################################################################
 # ./libexec/img.mk
 
+.PHONY: Dockerfile
+Dockerfile:
+	$(MAKE) -C $(CURDIR)/libexec -f img.mk $@;
+
 .PHONY: image_
 image_:
 	$(MAKE) -C $(CURDIR)/libexec -f img.mk $@;
