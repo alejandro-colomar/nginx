@@ -6,7 +6,7 @@
 SHELL = /bin/bash -Eeuo pipefail
 
 version	= $(shell git describe --tags | sed 's/^v//')
-branch	= $(shell git rev-parse --abrev-ref HEAD)
+branch	= $(shell git rev-parse --abbrev-ref HEAD)
 remote	= $(shell git config --get branch.$(branch).remote)
 
 config	= $(ROOTDIR)/.config
