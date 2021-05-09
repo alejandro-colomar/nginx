@@ -41,7 +41,7 @@ img_	= $(repository):$(lbl_)
 all: image
 
 .PHONY: Dockerfile
-Dockerfile: $(nginx)
+Dockerfile:
 	@echo '	Update Dockerfile ARGs';
 	sed -i \
 		-e '/^ARG	NGINX_REG=/s/=.*/="$(nginx_reg)"/' \
@@ -70,7 +70,7 @@ image:
 	$(MAKE) -f img.mk image-push;
 
 .PHONY: image-build
-image-build: Dockerfile $(image)
+image-build: Dockerfile
 	@echo '	DOCKER image build	$(img_a)';
 	docker image build -t '$(img_a)' $(ROOTDIR);
 	sed -i  's/^lbl.*/lbl	$(lbl_a)/' $(image_);
